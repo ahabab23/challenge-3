@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', function () {
     
 
 })
+
+
+// Display title, image, and like using the fetched data
 function dogDetails() {
     // Fetch image from URL
     fetch(imageUrl)
@@ -31,7 +34,8 @@ function dogDetails() {
         .then((data) => { diplayTitleImageLike(data) })
 }
 
-//  function to display title, image and likes
+
+//  function to display title, image and likes on the page
 function diplayTitleImageLike(data) {
     // set title to the data's title
     title.innerText = data.title
@@ -51,6 +55,7 @@ function diplayTitleImageLike(data) {
 
 }
 
+
 // Function to update like count on page and Api
 function likesDetail() {
     fetch(imageUrl)
@@ -61,6 +66,9 @@ function likesDetail() {
         })
 
 }
+
+
+
 // Function to increase like count
 function increaseLike(data) {
     // Select like button and like count elements
@@ -71,12 +79,15 @@ function increaseLike(data) {
         e.preventDefault()
         data.likes += 1
         likes.innerText = `${data.likes} likes`
-        // Updates Api
+        // Updates the server when  a new like has been added
         updateLikes(data)
     })
 
 }
-// Function to update Api using PATCH
+
+
+
+// Function to update server likes using PATCH method 
 function updateLikes(likes) {
     // Fetch request to update likes
     fetch(`${imageUrl}`, {
@@ -91,7 +102,9 @@ function updateLikes(likes) {
 }
 
 
-// Function to fetch comments from the API
+
+
+// Function to fetch comments from the API and display comments on the page
 function comments() {
     fetch(commentsUrl)
         .then(res => res.json())
@@ -106,10 +119,9 @@ function comments() {
                 // styling the list upon cursor
                 commentLists.style.cursor="pointer"
 
-                 // Deletes  a comment when aparticuler comment is clicked
-                deleteComment(commentLists)
-
-                // Append the list item to the comments list
+                 // Deletes  a comment and update the server when aparticuler comment is clicked
+                deleteComment(commentLists,comment)
+               // Append the list item to the comments list
                 commentsList.appendChild(commentLists)
             
 
@@ -120,7 +132,10 @@ function comments() {
 }
 
 
+
+
 const form = document.querySelector("form")
+// Listen for submit event on the form
 form.addEventListener('submit', function (e) {
     const commentsList = document.querySelector("#comments-list")
     // Select the comments list element
@@ -144,7 +159,11 @@ form.addEventListener('submit', function (e) {
 }
 
 )
-// Function to add an object to the commentsUrl endpoint
+
+
+
+
+// Function to add an objects to the commentsUrl endpoint
 function addObject(obj) {
     // Use the fetch API to make a POST request
     fetch(commentsUrl, {
@@ -156,24 +175,31 @@ function addObject(obj) {
     })
 }
 
+
+
   
-// Function to delete a comment when the comment is clicked
-function deleteComment(list) {
+// Function to delete a comment when the comment is clicked and update the server
+function deleteComment(list,comment) {
     // Add click event listener to the list
     list.addEventListener("click", () => {
         // Remove the list item when clicked
         list.remove();
+        removeCommentServer(comment)
+        
     });
 }
 
 
-// when title  of the image is clicked toggle image whether or not the image is being displaye
+
+// when title  of the image is clicked toggle image whether or not the image is being displayed
 function imageToggle(title){
     title.addEventListener("click",()=>{
         // add and remove hidden class
         cardImage.classList.toggle("hidden")
     })
 }
+
+
 
 // Random image when the image is clicked
 function randomImage(image){
@@ -187,3 +213,19 @@ function randomImage(image){
 
     })
 }
+
+
+
+// Function to remove comment from server
+function removeCommentServer(comment) {
+    // Fetch request to update likes
+    fetch(`http://localhost:3000/comments/${comment.id}`, {
+        // Set request method to PATCH
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'aplication/json'
+        }
+    })
+        .then(res => res.json())
+}
+
